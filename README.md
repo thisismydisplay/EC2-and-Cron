@@ -48,7 +48,7 @@ It's unclear as of this writing what this means for students, hobbyists, and the
 The EC2 portion of this tutorial is forthcoming.  Until then, feel free to use Amazon's offical tutorial and docs to get it set up in this order:
 
 1. [AWS Docs - Set up to use Amazon EC2](https://docs.amazonaws.cn/en_us/AWSEC2/latest/UserGuide/get-set-up-for-amazon-ec2.html)
-2. [AWS Docs - Tutorial: Get started with Amazon EC2 Linux instances](https://docs.amazonaws.cn/en_us/AWSEC2/latest/UserGuide/EC2_GetStarted.html)
+2. [AWS Docs - Tutorial: Get started with Amazon EC2 Linux instances](https://docs.amazonaws.cn/en_us/AWSEC2/latest/UserGuide/EC2_GetStarted.html) *Make sure to use Ubuntu Focal Fossa LTS for your Linux distro for this tutorial
 3. [AWS Docs - Connect to your Linux instance using SSH](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) (You can stop just before "Transfer files to Linux instances using an SCP client")
 
 ---
