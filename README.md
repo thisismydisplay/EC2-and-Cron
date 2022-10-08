@@ -45,12 +45,177 @@ It's unclear as of this writing what this means for students, hobbyists, and the
 
 # OK, let's get started!
 
-The EC2 portion of this tutorial is forthcoming by @nszad.  Until then, feel free to use Amazon's offical tutorial and docs to get it set up in this order:
+# Launching an EC2 instance
 
-1. [AWS Docs - Set up to use Amazon EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/get-set-up-for-amazon-ec2.html)
-2. [AWS Docs - Tutorial: Get started with Amazon EC2 Linux instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EC2_GetStarted.html) *Make sure to use Ubuntu Focal Fossa LTS for your Linux distro for this tutorial
-3. [AWS Docs - Connect to your Linux instance using SSH](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html) (You can stop just before "Transfer files to Linux instances using an SCP client")
+## Signing in to AWS
 
+NOTE: If you're starting from scratch, create an Amazon account by following the instructions [here.](https://aws.amazon.com/free/?all-free-tier.sort-by=item.additionalFields.SortRank&all-free-tier.sort-order=asc&awsf.Free%20Tier%20Types=*all&awsf.Free%20Tier%20Categories=*all)
+
+If you already have an Amazon account, go to the [AWS Management Console](https://aws.amazon.com/console/). Select "Root User" to sign in as a root user.
+
+Once logged in, find the the search bar at the top of the page, and search "EC2." Find "services," and select "EC2." This will take us to our EC2 dashboard.
+
+## Preparing to launch
+
+On the left-hand menu, click "Instances."
+
+This will take us to a dashboard that displays instances we currently have running. We haven't launched our instance yet, so we won't see anything here.
+
+In the top right corner, click "Launch Instances." 
+
+This opens "Launch an Instance." Below the heading you willl see a box called "Name and tags." In the text box, type a descriptive name for your instance, e.g., "My first instance" or "My app server."
+
+
+In the next section, "Application and OS Images (Amazon Machine Image)," select the Ubuntu AMI. This shows the latest LTS Ubuntu version (as of this writing, "Ubuntu Server 22.04 LTS (HVM), SSD Volume Type - Free tier eligible").
+
+Scroll down to the next section, called "Instance type." By default, it will show 't2.micro' (or t3.micro, if t2.micro is unavailable in your region). Clicking the dropdown, you'll see that there are a several different types of instances we could launch.  In basic terms, we are  launching a cloud computer that will live in a data center owned by Amazon, and the different types of "instances" represent different specifications for our computer. In the future, you might want to upgrade to a different instance (you can do this dynamically with a few clicks later, so don't worry about it right now). The t2.micro is AWS free-tier eligible, so we're going to leave that as our selection for now and proceed.
+
+## Creating a new key pair
+
+The next section is called "Key pair (login)." Now, select "Create new key pair."
+
+This will open a menu. Name your key pair in the text box. You can use the name of your app for now. For the other options, let's  leave 'RSA' selected for key pair type and '.pem' for private key file format.
+
+Click "Create key pair." A file, MyAppName.pem, will be downloaded to your computer. Note the location—you will need to locate this file on your computer in the next section.
+
+In "Network settings," leave the default selections or now and move on to "Configure storage."
+
+At the time of this writing, free tier eligible customers can get up to 30 GB of EBS General Purpose (SSD) or Magnetic storage," so we're going to change the 8GB to 30GB.
+
+Feel free to click the 'Advanced details' to get a sense of what options are available there, but we're not going to change anything right now.
+
+## Lift off!
+
+Click "Launch instance." 
+
+After a brief loading screen, we should see a "Success" indicating that our instance has been successfully launched. 
+
+Click the "View all instances."
+
+We should now see a listing of our instance showing the state "Running" with a green check mark next to it. This indicates that we now have our own computer in the cloud Let's play with it!
+
+# Configure your SSH (Secure Shell) connection
+
+
+In the previous section, we downloaded a file called, "myapp.pem." By default, it will be ```/Downloads```. To secure the file from potential leaks, we're going to connect to our instance via ssh. Going forward, this guide will assume that your .pem file is located in ```~/Downloads```, but you can replace that with the file path where you've stored it.
+
+If you run in to issues in this next part, see:
+* [Connect to your Linux instance using SSH](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html)
+
+## Change security permissions via the Terminal
+
+Open your terminal. If you are a Mac user, there is a good chance your ssh directory has not been created. First, we'll check to see if your .ssh directory exists. In your terminal, type: 
+
+```
+cd ~ 
+```
+This will open your home directory. Once here, type:
+
+```
+ls -a
+```
+This will list all files and directories, including hidden directories. Now, try and locate the ```.ssh``` directory. If the ```.ssh``` directory already exists, we don't need to do anything here. If it does NOT exist, type: ```mkdir .ssh``` and press enter to create a ```.ssh``` directory inside your home directory.
+
+Now that we've ensured our ```.ssh``` directory exists, we're going to move our .pem file there.
+
+Still in the terminal, type:
+
+```
+cd ~/Downloads
+```
+
+This will navigate you to the ```/Downloads``` directory where the .pem is currently stored.
+
+Now, type (using your own filename): 
+
+```
+mv myapp.pem ~/.ssh
+```
+
+This will move your .pem file to the ```.ssh``` directory.
+
+Now, navigate to the ```.ssh``` directory:
+
+```
+cd ~/.ssh
+```
+
+
+Once we're in the proper directory, we're going to need to set the permissions properly.
+
+First, let's take a look. Type:
+
+```
+ls -la
+```
+
+Next to myapp.pem, we will see something that looks like ```-rw-r--r---``` (Linux) or ```-rw-r--r--@``` (Mac)
+
+Now, type:
+```
+chmod 600 myapp.pem
+```
+This will change the permissions on the .pem file such that the user has read and write permissions and group numbers and others do not. (For more information on ```chmod``` see the [man page.](https://man7.org/linux/man-pages/man1/chmod.1.html))
+
+Linux users, that's it.
+Mac users have to type one more command to remove the ```@```:
+```
+xattr -c myapp.pem
+```
+
+Now we can confirm our updated permissions by typing:
+```
+ls -la
+```
+
+Now we should see ```-rw-------``` to the left of our .pem file.
+
+This means we have successfully changed the permissions and placed our .pem file in our ```.ssh``` directory, which means we can now connect to our EC2 instance via the terminal. 
+
+## Using SSH to connect to our EC2 instance
+
+Now the fun beings—we're going to use SSH to connect to our EC2 instance. First, you'll need the public IPv4 address of your new instance. This can be retrieved from the AWS console. 
+
+Navigate to the EC2 dashboard and click "Instances."
+
+Click on your Instance ID. This will look like a blue hyperlink under. "Instance ID."
+
+This will take you to the Instance summary. Find the heading "Public IPv4 address" and copy the IP address listed below the heading to your clipboard. 
+
+Now, go to your terminal. Make sure you are in the directory where the myapp.pem file is stored:
+```
+cd ~/.ssh
+```
+
+Now, type:
+
+```
+ssh -i myapp.pem ubuntu@myapp.<PUBLIC IPV4 ADDRESS>
+```
+
+
+(We could also provide the full path and ssh from any directory, like so):
+
+```
+ssh -i ~/.ssh/myapp.pem ubuntu@myapp.<PUBLIC IPV4 ADDRESS>
+```
+
+Be sure to substitute your app name and domain name. ```ubuntu``` is the default user.
+
+You will see something like
+```
+The authenticity of host 'ec2-123-45-678-9.compute-1.amazonaws.com (123-45-678-9)' can't be established.
+ECDSA key fingerprint is d8FT/adHym7kjsurWb7FRZltnUcJ56LrorpDofHQ7xAY.
+Are you sure you want to continue connecting (yes/no)?
+```
+
+Type ```yes``` and hit enter.
+
+Our shell with now show ubuntu@ip-OUR-ELASTIC-IP. This means we are now logged in as the default user, ubuntu, on our computer in the cloud. We can do whatever we want here.  Go ahead and type ```echo Hello Cloud!``` and hit ```Enter```.
+
+Your computer just said Hello!
+
+NOTE: If we hit ```Ctrl-D``` during our ssh session, it will disconnect the ssh session and our shell will be back on our local machine.  To reconnect, re-enter the ssh command from above (or just hit the up arrow, if you just disconnected the ssh command will be the last command you entered locally).
 ---
 
 # Cron and crontab
