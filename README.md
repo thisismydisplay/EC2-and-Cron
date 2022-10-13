@@ -177,11 +177,11 @@ Now, go to your terminal. Make sure you are in the directory where the myapp.pem
 
 Type:
 
-    ssh -i myapp.pem ubuntu@<myapp>.<PUBLIC IPV4 ADDRESS>
+    ssh -i <myapp>.pem ubuntu@<myapp>.<PUBLIC IPV4 ADDRESS>
 
 (We could also provide the full path and ssh from any directory, like so:)
 
-    ssh -i ~/.ssh/myapp.pem ubuntu@<myapp>.<PUBLIC IPV4 ADDRESS>
+    ssh -i ~/.ssh/<myapp>.pem ubuntu@<myapp>.<PUBLIC IPV4 ADDRESS>
 
 Be sure to substitute your app name and domain name. ubuntu is the default user.
 
